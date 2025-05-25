@@ -122,7 +122,7 @@ exports.Signout = async(req, res) => {
     }
 }
 
-exports.UserProfile = async(req, res) => {
+exports.editUserProfile = async(req, res) => {
     try {
         const {profilePic} = req.body;
         if(!profilePic){
@@ -158,9 +158,32 @@ exports.UserProfile = async(req, res) => {
     }
 }
 
-exports.getUser = async(req, res) => {
+exports.getUserProfile = async(req, res) => {
     try {
         const user = await User.findById(req.user._id).select("-password");
+        if(!user){
+            return res.status(400).json({
+                warning: true,
+                message: "User does not exist",
+            })
+        }
+        return res.status(200).json({
+            success: true,
+            message: "User fetched successfully",
+            data: user,
+        })
+    }catch(err){
+        console.log("Error user", err)
+        res.status(500).json({
+            error: true,
+            message: "Error user",
+        })
+    }
+}
+
+exports.getUserForSidebar = async(req, res) => {
+    try {
+        const user = await User.findById({_id: {$ne:req.user._id}}).select("-password");
         if(!user){
             return res.status(400).json({
                 warning: true,
