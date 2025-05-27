@@ -11,16 +11,8 @@ const ProtectedRoute = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await axiosInstance.post(
-          "/user/check",
-          {},
-          { withCredentials: true }
-        );
-        if (response.status === 200) {
-          setIsAuthenticated(true);
-        } else {
-          setIsAuthenticated(false);
-        }
+        const response = await axiosInstance.post("/user/check", {}, { withCredentials: true });
+        setIsAuthenticated(response.status === 200);
       } catch (err) {
         console.log(err);
         setIsAuthenticated(false);
@@ -31,9 +23,6 @@ const ProtectedRoute = ({ children }) => {
     checkAuth();
   }, []);
 
-  if(location.pathname === "/login" && isAuthenticated) return <Navigate to="/home" replace/>
-  if(location.pathname === "/signup" && isAuthenticated) return <Navigate to="/home" replace/>
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -42,9 +31,14 @@ const ProtectedRoute = ({ children }) => {
     );
   }
 
-  if (!isAuthenticated) {
-  
-    return <Navigate to="/login" state={{ from: location }} replace />;
+  // Handle public routes when authenticated
+  if (isAuthenticated && (location.pathname === "/login" || location.pathname === "/signup")) {
+    return <Navigate to="/home" replace />;
+  }
+
+  // Handle protected routes when not authenticated
+  if (!isAuthenticated && location.pathname !== "/login" && location.pathname !== "/signup") {
+    return <Navigate to="/login" replace />;
   }
 
   return children;
