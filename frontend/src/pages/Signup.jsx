@@ -1,0 +1,253 @@
+import React, {useState} from 'react'
+import { axiosInstance } from '../lib/axois'
+import { MessageSquare, User, Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react'
+import AuthImagePatten from '../components/AuthImagePatten'
+import { Link, useNavigate } from 'react-router-dom'
+
+function Signup() {
+  const navigate = useNavigate()
+    const [showPassword, setShowPassword] = useState(false)
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+    const [isSigningUp, setIsSigningUp] = useState(false)
+    const [showAlert, setShowAlert] = useState({
+        show: false,
+        message: "",
+    })
+    const [formData, setFormData] = useState({
+        name: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+    })
+
+    const handleChange = (e) => {
+        const { name, value } = e.target
+        setFormData((prevFormData) => ({
+            ...prevFormData,
+            [name]: value,
+        }))
+        
+        if(name === "password") {
+          if(value.length < 6) {
+            setShowAlert({
+              show: true,
+              message: "Password must be at least 6 characters",
+            })
+          } else {
+            setShowAlert({
+              show: false,
+              message: "",
+            })
+          }
+        }
+        if(name === "confirmPassword") {
+          if(value !== formData.password) {
+            setShowAlert({
+              show: true,
+              message: "Passwords do not match",
+            })
+          } else {
+            setShowAlert({
+              show: false,
+              message: "",
+            })
+          }
+        }
+    }
+
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+        if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+          setShowAlert({
+            show: true,
+            message: "All fields are required",
+          })
+          return
+        }
+        if (formData.password.length < 6) {
+          setShowAlert({
+            show: true,
+            message: "Password must be at least 6 characters",
+          })
+          return
+        }
+        if (formData.password !== formData.confirmPassword) {
+          setShowAlert({
+            show: true,
+            message: "Passwords do not match",
+          })
+          return
+        }
+        setIsSigningUp(true)
+        try {
+          await axiosInstance.post("/user/signup", formData)
+          navigate("/home")
+        } catch(error) {
+          setShowAlert({
+            show: true,
+            message: error.response?.data?.message || "An error occurred during signup",
+          })
+        } finally {
+          setIsSigningUp(false)
+          setTimeout(() => {
+            setShowAlert({
+              show: false,
+              message: "",
+            })
+          }, 3000)
+        }
+    }
+
+  return (
+    <div className='min-h-screen grid lg:grid-cols-2'>
+      {/* left side */}
+      <div className='flex flex-col justify-center items-center p-6 sm:p-12'>
+        <div className='w-full max-w-md space-y-8'>
+          {/* logo */}
+          <div className='text-center mb-8'>
+            <div className='flex flex-col items-center gap-2 group'>
+              <div className='size-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors'>
+                <MessageSquare className='size-6 text-primary'/>
+              </div>
+              <h1 className='text-2xl font-bold mt-2'> Create Account</h1>
+              <p className='text-base-content/60'> Get Started With Free Account</p>
+            </div>
+          </div>
+
+          {showAlert.show && (
+            <div className="alert alert-error">
+              <span>{showAlert.message}</span>
+            </div>
+          )}
+
+          {/* form */}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text font-medium">Full Name</span>
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-20">
+                  <User className="size-5 text-base-content/40" />
+                </div>
+                <input
+                  type="text"
+                  name="name"
+                  className={`input input-bordered w-full px-10`}
+                  placeholder="John Doe"
+                  value={formData.name}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text font-medium">Email</span>
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-20">
+                  <Mail className="size-5 text-base-content/40" />
+                </div>
+                <input
+                  type="email"
+                  name="email"
+                  className={`input input-bordered w-full px-10`}
+                  placeholder="you@example.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text font-medium">Password</span>
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-20">
+                  <Lock className="size-5 text-base-content/40" />
+                </div>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  className={`input input-bordered w-full px-10`}
+                  placeholder="••••••••"
+                  value={formData.password}
+                  onChange={handleChange}
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="size-5 text-base-content/40" />
+                  ) : (
+                    <Eye className="size-5 text-base-content/40" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text font-medium">Confirm Password</span>
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-20">
+                  <Lock className="size-5 text-base-content/40" />
+                </div>
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  name="confirmPassword"
+                  className={`input input-bordered w-full px-10`}
+                  placeholder="••••••••"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="size-5 text-base-content/40" />
+                  ) : (
+                    <Eye className="size-5 text-base-content/40" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" className="btn btn-primary w-full" disabled={isSigningUp}>
+              {isSigningUp ? (
+                <>
+                  <Loader2 className="size-5 animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                "Create Account"
+              )}
+            </button>
+          </form>
+          <div className='text-center'>
+            <p className='text-base-content/60'>
+              Already have an account?{" "}
+              <Link to="/login" className='text-primary'>
+                Login
+              </Link>
+            </p>
+          </div>
+        </div>
+      </div>
+      {/* right side */}
+      <AuthImagePatten 
+        title="Create Account"
+        desc="Create your account and start your journey with us"
+      />
+    </div>
+  )
+}
+
+export default Signup
