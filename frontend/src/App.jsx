@@ -1,31 +1,10 @@
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import DefaultLayout from "./Layout/DefaultLayout";
 import Signup from "./pages/Signup";
 import ProtectedRoute from "./Layout/ProtectedRoute";
-import {axiosInstance} from "./lib/axois.js";
-import { useEffect } from "react";
-
-function Signout() {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const signout = async () => {
-      try {
-        await axiosInstance.post("/user/signout", {}, { withCredentials: true });
-        navigate("/login");
-      } catch (error) {
-        console.error(error);
-        navigate("/login");
-      }
-    };
-    signout();
-  }, []);
-
-  return null; // or a loader
-}
-
+import Profile from "./pages/Profile";
 
 function App() {
 
@@ -51,8 +30,8 @@ function App() {
         />
         <Route element={<DefaultLayout />}>
           <Route path="/home" element={<Home />} />
+          <Route path="/profile" element={<Profile />} />
         </Route>
-        <Route path="/signout" element={<Signout/>} />
       </Routes>
     </BrowserRouter>
   );
