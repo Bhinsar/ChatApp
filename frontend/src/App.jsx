@@ -5,11 +5,20 @@ import DefaultLayout from "./Layout/DefaultLayout";
 import Signup from "./pages/Signup";
 import ProtectedRoute from "./Layout/ProtectedRoute";
 import Profile from "./pages/Profile";
+import Setting from "./pages/Setting";
+import { useEffect } from "react";
 
 function App() {
+  let theme;
+  useEffect(() => {
+    theme = localStorage.getItem("theme");
+    if (!theme) {
+      localStorage.setItem("theme", "light");
+    }
+  }, [])
 
   return (
-    <BrowserRouter>
+    <BrowserRouter data-theme = {theme} > 
       <Routes>
         <Route path="/" element={<Navigate to="/login" />} />
         <Route
@@ -31,6 +40,7 @@ function App() {
         <Route element={<DefaultLayout />}>
           <Route path="/home" element={<Home />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/settings" element={<Setting />} />
         </Route>
       </Routes>
     </BrowserRouter>
