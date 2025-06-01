@@ -11,7 +11,7 @@ const { initIO, addOnlineUser, removeOnlineUser, getOnlineUsers } = require("./s
 const path = require("path");
 
 dotenv.config();
-const __dirname = path.resolve();
+const _dirname = path.resolve();
 const port = process.env.PORT || 8080;
 app.use(express.json({limit: "10mb"}));
 app.use(cookieParser());
@@ -69,11 +69,11 @@ readdirSync("./src/routes").map((file) => {
 
 if (process.env.NODE_ENV === "production") {
     // Serve static files from the React app
-    app.use(express.static(path.join(__dirname, "frontend", "build")));
+    app.use(express.static(path.join(_dirname, "frontend", "build")));
 
     // Handle any requests that don't match the above routes
     app.get("*", (req, res) => {
-        res.sendFile(path.join(__dirname, "frontend", "build", "index.html"));
+        res.sendFile(path.join(_dirname, "frontend", "build", "index.html"));
     });
 }
 
