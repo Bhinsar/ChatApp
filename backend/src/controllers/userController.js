@@ -180,25 +180,73 @@ exports.getUserProfile = async (req, res) => {
 
 exports.getUserForSidebar = async (req, res) => {
   try {
-    const user = await User.findById({ _id: { $ne: req.user._id } }).select(
-      "-password"
-    );
-    if (!user) {
-      return res.status(400).json({
+    const authUserId = req.user._id;
+
+    // Aggregate users with their latest message
+    const users = await User.aggregate([
+      // Step 1: Exclude the authenticated user
+      { $match: { _id: { $ne: authUserId } } },
+
+      // Step 2: Lookup messages where the user is either sender or receiver
+      {
+        $lookup: {
+          from: 'messages', // The name of the Message collection in MongoDB
+          let: { userId: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $or: [
+                    { $and: [{ $eq: ['$senderId', '$$userId'] }, { $eq: ['$receiverId', authUserId] }] },
+                    { $and: [{ $eq: ['$senderId', authUserId] }, { $eq: ['$receiverId', '$$userId'] }] },
+                  ],
+                },
+              },
+            },
+            // Sort messages by createdAt in descending order to get the latest
+            { $sort: { createdAt: -1 } },
+            // Limit to 1 to get only the most recent message
+            { $limit: 1 },
+            // Project only the createdAt field
+            { $project: { createdAt: 1 } },
+          ],
+          as: 'latestMessage',
+        },
+      },
+
+      // Step 3: Unwind latestMessage (optional, since we expect 0 or 1 message)
+      { $unwind: { path: '$latestMessage', preserveNullAndEmptyArrays: true } },
+
+      // Step 4: Sort users by latestMessage.createdAt (descending, nulls last)
+      {
+        $sort: {
+          'latestMessage.createdAt': -1,
+          _id: 1, // Secondary sort by _id for consistent ordering of users with no messages
+        },
+      },
+
+      // Step 5: Exclude password field
+      { $project: { password: 0 } },
+    ]);
+
+    // Check if users were found
+    if (!users || users.length === 0) {
+      return res.status(404).json({
         warning: true,
-        message: "User does not exist",
+        message: 'No users found',
       });
     }
+
     return res.status(200).json({
       success: true,
-      message: "User fetched successfully",
-      data: user,
+      message: 'Users fetched successfully',
+      data: users,
     });
   } catch (err) {
-    console.log("Error user", err);
+    console.error('Error fetching users:', err);
     res.status(500).json({
       error: true,
-      message: "Error user",
+      message: 'Error fetching users',
     });
   }
 };

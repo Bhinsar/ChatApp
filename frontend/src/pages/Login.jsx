@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import AuthImagePatten from "../components/AuthImagePatten";
 import { Link, useNavigate } from "react-router-dom";
+import {ConnectionManager} from "../lib/socket.js";
 
 function Login() {
   const navigate = useNavigate();
@@ -35,6 +36,7 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!formData.email || !formData.password) {
       setShowAlert({
         show: true,
@@ -52,14 +54,17 @@ function Login() {
 
     setIsLoggingIn(true);
     try {
-      await axiosInstance.post("/user/signin", formData);
+      const res = await axiosInstance.post("/user/signin", formData);
       navigate("/home");
+      const user = res.data.data;
+      localStorage.setItem("userId", (user.id));
     } catch (error) {
       setShowAlert({
         show: true,
         message: error.response?.data?.message || "An error occurred during login",
       });
     } finally {
+      ConnectionManager.connect();
       setIsLoggingIn(false);
       setTimeout(() => {
         setShowAlert({
