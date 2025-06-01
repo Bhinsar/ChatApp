@@ -1,13 +1,13 @@
-// lib/socket.js
-import { io } from "socket.io-client";
-import { useEffect, useState } from "react";
+import { io } from 'socket.io-client';
+import { useEffect, useState } from 'react';
 
-const baseUrl =
-  import.meta.env.MODE === "development"
-    ? "http://localhost:8080"
-    : import.meta.env.VITE_BACKEND_URL;
+const baseUrl = import.meta.env.MODE === 'development'
+  ? 'http://localhost:8080'
+  : import.meta.env.VITE_BACKEND_URL;
 
+// ✅ This line must be at the top-level scope
 let socket = null;
+
 
 export const ConnectionManager = {
   connect: (userId) => {
