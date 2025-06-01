@@ -21,3 +21,4 @@ const messageSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+module.exports = mongoose.model("Message", messageSchema);
