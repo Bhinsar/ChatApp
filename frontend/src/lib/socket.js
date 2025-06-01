@@ -2,7 +2,7 @@
 import { io } from 'socket.io-client';
 import {useEffect, useState, useCallback} from "react";
 
-const baseUrl = "http://localhost:8080";
+const baseUrl = import.meta.env.MODE === "development" ? "http://localhost:8080" : "",
 
 // Create a single socket instance to be used by both functions
 let socket = null;
