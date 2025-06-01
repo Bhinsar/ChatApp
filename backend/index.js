@@ -16,7 +16,7 @@ const port = process.env.PORT || 8080;
 app.use(express.json({limit: "10mb"}));
 app.use(cookieParser());
 app.use(cors({
-    origin: process.env.FrontEnd_url || "http://localhost:3000", // frontend origin
+    origin: "http://localhost:3000", // frontend origin
     credentials: true
 }));
 
@@ -24,7 +24,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
-        origin: [process.env.FrontEnd_url || "http://localhost:3000"],
+        origin: ["http://localhost:3000"],
         credentials: true
     }
 });
