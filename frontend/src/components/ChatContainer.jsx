@@ -10,9 +10,12 @@ function ChatContainer({selectedUser, setSelectedUser, getMessages, isMessageLoa
 
     // Function to format message time
     const formatMessageTime = (dateString) => {
-        const date = new Date(dateString);
-        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    };
+    const date = new Date(dateString);
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
+};
+
 
     useEffect(() => {
         // Fetch the authenticated user

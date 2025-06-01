@@ -8,14 +8,15 @@ const cors = require("cors");
 const {Server} = require("socket.io");
 const http = require("node:http");
 const { initIO, addOnlineUser, removeOnlineUser, getOnlineUsers } = require("./src/lib/socket");
+const path = require("path");
 
 dotenv.config();
-
+const __dirname = path.resolve();
 const port = process.env.PORT || 8080;
 app.use(express.json({limit: "10mb"}));
 app.use(cookieParser());
 app.use(cors({
-    origin: "http://localhost:3000", // frontend origin
+    origin: process.env.FrontEnd_url || "http://localhost:3000", // frontend origin
     credentials: true
 }));
 
@@ -23,7 +24,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
-        origin: ["http://localhost:3000"],
+        origin: [process.env.FrontEnd_url || "http://localhost:3000"],
         credentials: true
     }
 });
@@ -65,6 +66,16 @@ readdirSync("./src/routes").map((file) => {
     const routePath = `./src/routes/${file}`;
     app.use("/", require(routePath));
 });
+
+if (process.env.NODE_ENV === "production") {
+    // Serve static files from the React app
+    app.use(express.static(path.join(__dirname, "frontend", "build")));
+
+    // Handle any requests that don't match the above routes
+    app.get("*", (req, res) => {
+        res.sendFile(path.join(__dirname, "frontend", "build", "index.html"));
+    });
+}
 
 server.listen(port, () => {
     console.log("Server is running on port 8080");
