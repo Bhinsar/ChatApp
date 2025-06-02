@@ -16,7 +16,6 @@ const {
 const path = require("path");
 
 dotenv.config();
-const _dirname = path.resolve();
 const port = process.env.PORT || 8080;
 
 app.use(express.json({ limit: "10mb" }));
@@ -66,13 +65,19 @@ readdirSync("./src/routes")
   .filter((file) => file.endsWith(".js"))
   .forEach((file) => {
     const route = require(`./src/routes/${file}`);
-    app.use("/", route);
+    // Mount routes with specific base paths
+    if (file === "userRoutes.js") {
+      app.use("/api", route);
+    } else if (file === "messageRoutes.js") {
+      app.use("/api", route);
+    }
   });
 
+// In production, serve static files and handle client-side routing
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(_dirname, "frontend", "build")));
+  app.use(express.static(path.join(__dirname, "frontend", "build")));
   app.get("*", (req, res) => {
-    res.sendFile(path.join(_dirname, "frontend", "build", "index.html"));
+    res.sendFile(path.join(__dirname, "frontend", "build", "index.html"));
   });
 }
 
