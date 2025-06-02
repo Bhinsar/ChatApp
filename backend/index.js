@@ -62,10 +62,12 @@ app.get("/", (req, res) => {
 });
 
 // Load routes with debugging
-readdirSync("./src/routes").map((file) => {
-    const routePath = `./src/routes/${file}`;
-    app.use("/", require(routePath));
-});
+readdirSync("./src/routes")
+  .filter((file) => file.endsWith(".js"))
+  .forEach((file) => {
+    const route = require(`./src/routes/${file}`);
+    app.use("/", route);
+  });
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(_dirname, "frontend", "build")));
