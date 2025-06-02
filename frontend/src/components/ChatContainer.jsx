@@ -21,7 +21,7 @@ function ChatContainer({selectedUser, setSelectedUser, getMessages, isMessageLoa
         // Fetch the authenticated user
         const getAuthUser = async () => {
             try {
-                const res = await axiosInstance("/user/get");
+                const res = await axiosInstance("/user/profile");
                 setAuthUser(res.data.data);
             } catch (err) {
                 console.log(err);

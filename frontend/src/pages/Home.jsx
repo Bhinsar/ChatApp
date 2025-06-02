@@ -19,7 +19,7 @@ function Home() {
     const getUsers = async (loading = true) =>  {
         try {
             setUserLoading(loading);
-            const res = await axiosInstance.get('/get/users');
+            const res = await axiosInstance.get('/user/sidebar');
             setUsers(res.data.data);
         } catch (err) {
             console.error('Error fetching users:', err);
@@ -31,7 +31,7 @@ function Home() {
     const getMessages = async (userId, loading = true) => {
         try {
             setMessageLoading(loading);
-            const res = await axiosInstance.get(`/get/messages/${userId}`);
+            const res = await axiosInstance.get(`/messages/get/${userId}`);
             setMessages(res.data);
         } catch (err) {
             console.error('Error fetching messages:', err);

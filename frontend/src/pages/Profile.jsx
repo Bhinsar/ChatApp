@@ -10,7 +10,7 @@ function Profile() {
   useEffect(() => {
     const getUser = async () => {
       try {
-        const res = await axiosInstance("/user/get");
+        const res = await axiosInstance("/user/profile");
 
         setUser(res.data.data);
       } catch (err) {
@@ -32,7 +32,7 @@ function Profile() {
       setSelectedImg(base64Image);
       setIsUpdatingProfile(true);
       try {
-        const res = await axiosInstance.put("/user/update", {
+        const res = await axiosInstance.put("/profile", {
           profilePic: base64Image,
         });
         setUser(res.data.data);
@@ -43,7 +43,7 @@ function Profile() {
     };
   };
   return (
-    <div className="h-scren pt-20">
+    <div className="h-screen pt-20">
       <div className="max-w-2xl mx-auto p-4 py-8">
         <div className="bg-base-300 rounded-xl p-6 space-y-8">
           <div className="text-center">

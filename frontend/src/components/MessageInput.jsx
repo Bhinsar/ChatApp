@@ -31,7 +31,7 @@ const MessageInput = ({selectedUser, getMessages, getUsers}) => {
         if (!text.trim() && !imagePreview) return;
 
         try {
-            await axiosInstance.post(`/send/message/${selectedUser._id}`, {
+            await axiosInstance.post(`/messages/send/${selectedUser._id}`, {
                 text: text.trim(),
                 image: imagePreview,
             });

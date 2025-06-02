@@ -1,7 +1,7 @@
 import { io } from 'socket.io-client';
 import { useEffect, useState } from 'react';
 
-const baseUrl = import.meta.env.MODE === 'development' ? 'http://localhost:8080' : '';
+const baseUrl = import.meta.env.MODE === 'development' ? 'http://localhost:8080/api' : '/';
 
 // Use a closure to manage the socket instance
 const ConnectionManager = (() => {
