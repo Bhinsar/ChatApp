@@ -1,6 +1,5 @@
 const express = require("express");
 const app = express();
-const readdirSync = require("fs").readdirSync;
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
@@ -23,7 +22,7 @@ app.use(cookieParser());
 const corsOptions = {
   origin:
     process.env.NODE_ENV === "production"
-      ? process.env.FRONTEND_URL || "https://your-frontend.onrender.com"
+      ? process.env.FRONTEND_URL 
       : "http://localhost:3000",
   credentials: true,
 };
@@ -60,24 +59,20 @@ app.get("/", (req, res) => {
   res.send("Server is running");
 });
 
-// Load routes with debugging
-readdirSync("./src/routes")
-  .filter((file) => file.endsWith(".js"))
-  .forEach((file) => {
-    const route = require(`./src/routes/${file}`);
-    // Mount routes with specific base paths
-    if (file === "userRoutes.js") {
-      app.use("/api", route);
-    } else if (file === "messageRoutes.js") {
-      app.use("/api", route);
-    }
-  });
+// Replace the route loading section with this:
+const userRoutes = require('./src/routes/userRoute');
+const messageRoutes = require('./src/routes/messageRoute');
 
-// In production, serve static files and handle client-side routing
+// Mount routes with explicit paths
+app.use('/api/user', userRoutes);
+app.use('/api/messages', messageRoutes);
+
+// API routes should come before the static file handling
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "frontend", "build")));
+  app.use(express.static(path.join(__dirname, "../frontend/dist")));
+
   app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "frontend", "build", "index.html"));
+    res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
   });
 }
 
